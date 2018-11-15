@@ -1,5 +1,4 @@
 from Tkinter import *
-
 from updater import ArcDpsUpdater
 
 
@@ -19,7 +18,7 @@ class Window(Frame):
         quit_button.place(relx=0.5, rely=0.5, anchor=CENTER)
 
     def exit_client(self):
-        exit()
+        sys.exit(1)
 
     def launch_game(self):
         updater = ArcDpsUpdater()
