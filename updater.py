@@ -63,7 +63,6 @@ class ArcDpsUpdater:
 
     def _launch_application(self, arguments):
         path = self.game_path + self.file + '.exe {}'.format(arguments)
-        print path
         return subprocess.Popen(path)
 
     def _calculate_md5(self, fname):
