@@ -1,0 +1,6 @@
+game_path = C:\Program Files (x86)\Guild Wars 2\
+executable_name = Gw2-64
+md5_uri = https://www.deltaconnected.com/arcdps/x64/d3d9.dll.md5sum
+d3d9_uri = https://www.deltaconnected.com/arcdps/x64/d3d9.dll
+bt_uri = https://www.deltaconnected.com/arcdps/x64/buildtemplates/d3d9_arcdps_buildtemplates.dll
+arguments =
