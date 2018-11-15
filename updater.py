@@ -1,7 +1,9 @@
 import subprocess
 import os
+import urllib
 import urllib2
 import hashlib
+from shutil import copyfile
 
 
 class ArcDpsUpdater:
@@ -21,7 +23,7 @@ class ArcDpsUpdater:
         """
         *** Command line arguments ***
         
-        Add any commandline arguments you need here separated by a comma and encloded in single quotes
+        Add any commandline arguments you need here separated by a comma and enclosed in single quotes
         List of arguments available at https://wiki.guildwars2.com/wiki/Command_line_arguments
             
             E.g.: arguments = ['-clientport 80', '-maploadinfo']
@@ -29,23 +31,31 @@ class ArcDpsUpdater:
         self.arguments = []
 
     def check_for_updates(self):
-        dll_path = self.game_path + 'bin64/d3d9.dll'
-        dll_exists = os.path.isfile(dll_path)
+        d3d9_path = self.game_path + 'bin64/d3d9.dll'
+        d3d9_backup_path = self.game_path + 'bin64/d3d9.dll.bak'
+        bt_path = self.game_path + 'bin64/d3d9_arcdps_buildtemplates.dll'
+        bt_backup_path = self.game_path + 'bin64/d3d9_arcdps_buildtemplates.dll.bak'
+        dll_exists = os.path.isfile(d3d9_path)
         if dll_exists:
-            existing_md5 = self._calculate_md5(dll_path)
+            existing_md5 = self._calculate_md5(d3d9_path)
             if existing_md5 != self._original_md5():
                 print 'ArcDPS is out of date'
-                # TODO: implement file backups
-                self._update_arcdps()
+                copyfile(d3d9_path, d3d9_backup_path)
+                copyfile(bt_path, bt_backup_path)
+                self._update_arcdps(d3d9_path, bt_path)
             else:
                 print 'ArcDPS is up to date'
                 self._run_gw2()
         else:
-            print 'Unable to find d3d9.dll from current game path'
+            self._update_arcdps(d3d9_path, bt_path)
 
-    def _update_arcdps(self):
-        # TODO: implement updating
-        pass
+    def _update_arcdps(self, d3d9path, btpath):
+        d3d9_file = urllib.URLopener()
+        d3d9_file.retrieve(self.d3d9_uri, d3d9path)
+        bt_file = urllib.URLopener()
+        bt_file.retrieve(self.bt_uri, btpath)
+        print 'Completed ArcDPS install'
+        self._run_gw2()
 
     def _run_gw2(self):
         self._launch_application(self.arguments) if self.arguments is not None and len(
