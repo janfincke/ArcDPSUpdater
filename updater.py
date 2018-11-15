@@ -13,7 +13,11 @@ class ArcDpsUpdater:
         lines = settings_file.read().splitlines()
         settings = []
         for line in lines:
-            settings.append(line.split('= ',1)[1])
+            try:
+                line = line.split('= ', 1)[1]
+            except IndexError:
+                line = ""
+            settings.append(line)
         self.file = settings[1]
         self.game_path = settings[0]
         self.md5_uri = settings[2]
@@ -58,7 +62,7 @@ class ArcDpsUpdater:
             self.arguments) < 1 else self._launch_application(self.arguments)
 
     def _launch_application(self, arguments):
-        path = self.game_path + self.file + '.exe {}'.format("".join(arguments))
+        path = self.game_path + self.file + '.exe {}'.format(arguments)
         print path
         return subprocess.Popen(path)
 
