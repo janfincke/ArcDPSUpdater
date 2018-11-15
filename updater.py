@@ -9,33 +9,24 @@ from time import sleep
 
 class ArcDpsUpdater:
     def __init__(self):
-        self.file = 'Gw2-64'  # Executable Name
-        self.game_path = 'C:\\Guild Wars 2\\'  # Executable Path
-
-        """
-        *** Mandatory URI paths ***
-        
-        DON'T CHANGE THESE UNLESS ARC DOES!
-        """
-        self.md5_uri = 'https://www.deltaconnected.com/arcdps/x64/d3d9.dll.md5sum'
-        self.d3d9_uri = 'https://www.deltaconnected.com/arcdps/x64/d3d9.dll'
-        self.bt_uri = 'https://www.deltaconnected.com/arcdps/x64/buildtemplates/d3d9_arcdps_buildtemplates.dll'
-
-        """
-        *** Command line arguments ***
-        
-        Add any commandline arguments you need here separated by a comma and enclosed in single quotes
-        List of arguments available at https://wiki.guildwars2.com/wiki/Command_line_arguments
-            
-            E.g.: arguments = ['-clientport 80', '-maploadinfo']
-        """
-        self.arguments = []
+        settings_file = open('settings.txt', 'rb')
+        lines = settings_file.read().splitlines()
+        settings = []
+        for line in lines:
+            settings.append(line.split('= ',1)[1])
+        self.file = settings[1]
+        self.game_path = settings[0]
+        self.md5_uri = settings[2]
+        self.d3d9_uri = settings[3]
+        self.bt_uri = settings[4]
+        self.arguments = settings[5]
 
     def check_for_updates(self):
-        d3d9_path = self.game_path + 'bin64/d3d9.dll'
-        d3d9_backup_path = self.game_path + 'bin64/d3d9.dll.bak'
-        bt_path = self.game_path + 'bin64/d3d9_arcdps_buildtemplates.dll'
-        bt_backup_path = self.game_path + 'bin64/d3d9_arcdps_buildtemplates.dll.bak'
+        d3d9_path = self.game_path + '/bin64/d3d9.dll'
+        d3d9_backup_path = self.game_path + '/bin64/d3d9.dll.bak'
+        bt_path = self.game_path + '/bin64/d3d9_arcdps_buildtemplates.dll'
+        bt_backup_path = self.game_path + '/bin64/d3d9_arcdps_buildtemplates.dll.bak'
+        
         dll_exists = os.path.isfile(d3d9_path)
         if dll_exists:
             existing_md5 = self._calculate_md5(d3d9_path)
@@ -67,7 +58,8 @@ class ArcDpsUpdater:
             self.arguments) < 1 else self._launch_application(self.arguments)
 
     def _launch_application(self, arguments):
-        path = self.game_path + self.file + '.exe {}'.format(" ".join(arguments))
+        path = self.game_path + self.file + '.exe {}'.format("".join(arguments))
+        print path
         return subprocess.Popen(path)
 
     def _calculate_md5(self, fname):
