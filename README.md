@@ -1,6 +1,13 @@
 # ArcDPS Updater
 A quick Python project that updates the ArcDPS addon for Guild Wars 2 with a click of a button.
 
+## Installation
+
+1. Download ArcDPSUpdater and extract content.
+2. Open **settings.txt**
+3. Set game path, executable name if different than default settings.
+4. Launch the application.
+
 ## Settings
 
 **game_path**
@@ -15,3 +22,5 @@ A quick Python project that updates the ArcDPS addon for Guild Wars 2 with a cli
      **arguments = -maploadinfo -clientport 80**
   * [Click here for full argument information.](https://wiki.guildwars2.com/wiki/Command_line_arguments)
 ### Please do NOT modify the URL paths!
+
+
