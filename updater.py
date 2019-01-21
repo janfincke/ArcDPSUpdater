@@ -18,12 +18,12 @@ class ArcDpsUpdater:
             except IndexError:
                 line = ""
             settings.append(line)
+        self.game_path = settings[0] 
         self.file = settings[1]
-        self.game_path = settings[0]
-        self.md5_uri = settings[2]
-        self.d3d9_uri = settings[3]
-        self.bt_uri = settings[4]
-        self.arguments = settings[5]
+        self.arguments = settings[2]
+        self.md5_uri = 'https://www.deltaconnected.com/arcdps/x64/d3d9.dll.md5sum'
+        self.d3d9_uri = 'https://www.deltaconnected.com/arcdps/x64/d3d9.dll'
+        self.bt_uri = 'https://www.deltaconnected.com/arcdps/x64/buildtemplates/d3d9_arcdps_buildtemplates.dll'
 
     def check_for_updates(self):
         d3d9_path = self.game_path + '/bin64/d3d9.dll'
@@ -31,19 +31,22 @@ class ArcDpsUpdater:
         bt_path = self.game_path + '/bin64/d3d9_arcdps_buildtemplates.dll'
         bt_backup_path = self.game_path + '/bin64/d3d9_arcdps_buildtemplates.dll.bak'
         
-        dll_exists = os.path.isfile(d3d9_path)
-        if dll_exists:
-            existing_md5 = self._calculate_md5(d3d9_path)
-            if existing_md5 != self._original_md5():
-                print 'ArcDPS is out of date.'
-                sleep(1)
-                copyfile(d3d9_path, d3d9_backup_path)
-                copyfile(bt_path, bt_backup_path)
-                self._update_arcdps(d3d9_path, bt_path)
+        try:
+            dll_exists = os.path.isfile(d3d9_path)
+            if dll_exists:
+                existing_md5 = self._calculate_md5(d3d9_path)
+                if existing_md5 != self._original_md5():
+                    print 'ArcDPS is out of date.'
+                    sleep(1)
+                    copyfile(d3d9_path, d3d9_backup_path)
+                    copyfile(bt_path, bt_backup_path)
+                    self._update_arcdps(d3d9_path, bt_path)
+                else:
+                    print 'ArcDPS is up to date!'
+                    self._run_gw2()
             else:
-                print 'ArcDPS is up to date!'
-                self._run_gw2()
-        else:
+                self._update_arcdps(d3d9_path, bt_path)
+        except:
             self._update_arcdps(d3d9_path, bt_path)
 
     def _update_arcdps(self, d3d9path, btpath):
