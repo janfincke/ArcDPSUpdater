@@ -21,6 +21,5 @@ A quick Python project that updates the ArcDPS addon for Guild Wars 2 with a cli
 
      **arguments = -maploadinfo -clientport 80**
   * [Click here for full argument information.](https://wiki.guildwars2.com/wiki/Command_line_arguments)
-### Please do NOT modify the URL paths!
 
 
