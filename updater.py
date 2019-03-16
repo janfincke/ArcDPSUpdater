@@ -1,44 +1,66 @@
-import subprocess
+import _winreg
+import hashlib
 import os
+import subprocess
 import urllib
 import urllib2
-import hashlib
 from shutil import copyfile
+
 from time import sleep
 
 
 class ArcDpsUpdater:
     def __init__(self):
-        settings_file = open('settings.txt', 'rb')
-        lines = settings_file.read().splitlines()
-        settings = []
-        for line in lines:
-            try:
-                line = line.split('= ', 1)[1]
-            except IndexError:
-                line = ""
-            settings.append(line)
-        self.game_path = settings[0] 
-        self.file = settings[1]
-        self.arguments = settings[2]
         self.md5_uri = 'https://www.deltaconnected.com/arcdps/x64/d3d9.dll.md5sum'
         self.d3d9_uri = 'https://www.deltaconnected.com/arcdps/x64/d3d9.dll'
         self.bt_uri = 'https://www.deltaconnected.com/arcdps/x64/buildtemplates/d3d9_arcdps_buildtemplates.dll'
+
+        settings_file = open('settings.txt', 'rb')
+        with settings_file as f:
+            settings = ''.join(f.readline())
+
+        self.arguments = settings
+
+        registry_path = 'Software\\ArenaNet\\Guild Wars 2'
+        key_64 = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, registry_path, 0,
+                                 _winreg.KEY_READ | _winreg.KEY_WOW64_64KEY)
+        key_32 = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, registry_path)
+
+        try:
+            value_64 = _winreg.QueryValueEx(key_64, "Path")[0]
+            value_32 = _winreg.QueryValueEx(key_32, "Path")[0]
+        except TypeError:
+            print 'Could not get registry keys for game path!'
+            raw_input('Press any key to continue...')
+            raise SystemExit
+
+        if value_64:
+            self.file = value_64
+            self.game_path = self.file.split(os.path.basename(self.file))[0]
+        else:
+            if value_32:
+                self.file = value_32
+                self.game_path = self.file.split(os.path.basename(self.file))[0]
+            else:
+                print 'Could not find Guild Wars 2 from system!'
+                raw_input('Press any key to continue...')
+                raise SystemExit
+
         if not os.path.isdir(self.game_path):
             print 'Unable to find game path!'
             raw_input('Press any key to continue...')
             raise SystemExit
 
-        if not os.path.isfile(self.game_path + self.file + '.exe'):
+        if not os.path.isfile(self.file):
             print 'Unable to find game executable!'
             raw_input('Press any key to continue...')
             raise SystemExit
 
     def check_for_updates(self):
-        d3d9_path = self.game_path + '/bin64/d3d9.dll'
-        d3d9_backup_path = self.game_path + '/bin64/d3d9.dll.bak'
-        bt_path = self.game_path + '/bin64/d3d9_arcdps_buildtemplates.dll'
-        bt_backup_path = self.game_path + '/bin64/d3d9_arcdps_buildtemplates.dll.bak'
+        d3d9_path = self.game_path + 'bin64\\d3d9.dll'
+        d3d9_backup_path = self.game_path + 'bin64\\d3d9.dll.bak'
+        bt_path = self.game_path + 'bin64\\d3d9_arcdps_buildtemplates.dll'
+        bt_backup_path = self.game_path + 'bin64\\d3d9_arcdps_buildtemplates.dll.bak'
         dll_exists = os.path.isfile(d3d9_path)
         if dll_exists:
             existing_md5 = self._calculate_md5(d3d9_path)
@@ -70,7 +92,7 @@ class ArcDpsUpdater:
             self.arguments) < 1 else self._launch_application(self.arguments)
 
     def _launch_application(self, arguments):
-        path = self.game_path + self.file + '.exe {}'.format(arguments)
+        path = self.file + ' {}'.format(arguments)
         return subprocess.Popen(path)
 
     def _calculate_md5(self, fname):

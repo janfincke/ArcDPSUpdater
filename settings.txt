@@ -1,3 +1,0 @@
-game_path = C:\Guild Wars 2\
-executable_name = Gw2-64
-arguments =
