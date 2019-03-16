@@ -38,14 +38,13 @@ class ArcDpsUpdater:
         if value_64:
             self.file = value_64
             self.game_path = self.file.split(os.path.basename(self.file))[0]
-        else:
-            if value_32:
+        elif value_32:
                 self.file = value_32
                 self.game_path = self.file.split(os.path.basename(self.file))[0]
-            else:
-                print 'Could not find Guild Wars 2 from system!'
-                raw_input('Press any key to continue...')
-                raise SystemExit
+        else:
+            print 'Could not find Guild Wars 2 from system!'
+            raw_input('Press any key to continue...')
+            raise SystemExit
 
         if not os.path.isdir(self.game_path):
             print 'Unable to find game path!'
