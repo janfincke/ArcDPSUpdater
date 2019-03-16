@@ -11,7 +11,7 @@ A quick Python project that updates the ArcDPS addon for Guild Wars 2 with a cli
 ## Settings
 
 **game_path**
-  * Path to the installation directory. (Default: C:\Guild Wars 2\)
+  * Path to the installation directory. (Default: C:\Program Files (x86)\Guild Wars 2\)
 
 **executable_name**
   * Executable name in the installation folder. (Default: Gw2-64)
