@@ -22,29 +22,24 @@ class ArcDpsUpdater:
             settings = ''
         self.arguments = settings
 
-        registry_path = 'Software\\ArenaNet\\Guild Wars 2'
-        key_64 = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, registry_path, 0,
-                                 _winreg.KEY_READ | _winreg.KEY_WOW64_64KEY)
-        key_32 = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, registry_path)
-
+        registry_path = r'Software\\ArenaNet\\Guild Wars 2'
         try:
+            key_64 = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, registry_path, 0,
+                                     _winreg.KEY_READ | _winreg.KEY_WOW64_64KEY)
             value_64 = _winreg.QueryValueEx(key_64, "Path")[0]
-            value_32 = _winreg.QueryValueEx(key_32, "Path")[0]
-        except TypeError:
-            print 'Could not get registry keys for game path!'
-            raw_input('Press any key to continue...')
-            raise SystemExit
-
-        if value_64:
             self.file = value_64
             self.game_path = self.file.split(os.path.basename(self.file))[0]
-        elif value_32:
+        except WindowsError as e:
+            try:
+                key_32 = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, registry_path, 0,
+                                         _winreg.KEY_READ | _winreg.KEY_WOW64_32KEY)
+                value_32 = _winreg.QueryValueEx(key_32, "Path")[0]
                 self.file = value_32
                 self.game_path = self.file.split(os.path.basename(self.file))[0]
-        else:
-            print 'Could not find Guild Wars 2 from system!'
-            raw_input('Press any key to continue...')
-            raise SystemExit
+            except WindowsError as e:
+                print 'Could not get registry keys for game path!'
+                raw_input('Press any key to continue...')
+                raise SystemExit
 
         if not os.path.isdir(self.game_path):
             print 'Unable to find game path!'
