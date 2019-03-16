@@ -88,8 +88,7 @@ class ArcDpsUpdater:
 
     def _run_gw2(self):
         sleep(1)
-        self._launch_application(self.arguments) if self.arguments is not None and len(
-            self.arguments) < 1 else self._launch_application(self.arguments)
+        self._launch_application(self.arguments)
 
     def _launch_application(self, arguments):
         path = self.file + ' {}'.format(arguments)
