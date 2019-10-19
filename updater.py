@@ -4,9 +4,15 @@ import os
 import subprocess
 from urllib.request import urlretrieve, urlopen
 from shutil import copyfile
-
+from tqdm import tqdm
 from time import sleep
 
+
+class DownloadProgressBar(tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        self.update(b * bsize - self.n)
 
 class ArcDpsUpdater:
     def __init__(self):
@@ -60,17 +66,18 @@ class ArcDpsUpdater:
                 print('ArcDPS is out of date.')
                 sleep(1)
                 copyfile(d3d9_path, d3d9_backup_path)
-                self._update_arcdps(d3d9_path)
+                self._update_arcdps(self.d3d9_uri, d3d9_path)
             else:
                 print('ArcDPS is up to date!')
                 self._run_gw2()
         else:
-            self._update_arcdps(d3d9_path)
+            self._update_arcdps(self.d3d9_uri, d3d9_path)
 
-    def _update_arcdps(self, d3d9path):
+    def _update_arcdps(self, url, d3d9path):
         print('Downloading d3d9.dll...')
-        urlretrieve(self.d3d9_uri, d3d9path)
-        print('Completed ArcDPS install!')
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, desc=url.split('/')[-1]) as t:
+            urlretrieve(url, d3d9path, reporthook=t.update_to)
+        print('\nCompleted ArcDPS install!')
         self._run_gw2()
 
     def _run_gw2(self):
