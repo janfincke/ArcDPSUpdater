@@ -19,12 +19,11 @@ class ArcDpsUpdater:
         self.md5_uri = 'https://www.deltaconnected.com/arcdps/x64/d3d9.dll.md5sum'
         self.d3d9_uri = 'https://www.deltaconnected.com/arcdps/x64/d3d9.dll'
         self.bt_uri = 'https://www.deltaconnected.com/arcdps/x64/buildtemplates/d3d9_arcdps_buildtemplates.dll'
-        try:
+        settings = ''
+        if os.path.isfile('settings.txt'):
             settings_file = open('settings.txt', 'rb')
             with settings_file as f:
                 settings = ''.join(f.readline())
-        except:
-            settings = ''
         self.arguments = settings
 
         registry_path = r'Software\\ArenaNet\\Guild Wars 2'
@@ -62,7 +61,8 @@ class ArcDpsUpdater:
         dll_exists = os.path.isfile(d3d9_path)
         if dll_exists:
             existing_md5 = self._calculate_md5(d3d9_path)
-            if existing_md5 != self._original_md5():
+            original_md5 = self._original_md5()
+            if existing_md5 != original_md5:
                 print('ArcDPS is out of date.')
                 sleep(1)
                 copyfile(d3d9_path, d3d9_backup_path)
@@ -93,4 +93,5 @@ class ArcDpsUpdater:
 
     def _original_md5(self):
         response = urlopen(self.md5_uri).read()
-        return str(response).split(' ', 1)[0]
+        response = response.decode('utf-8')
+        return response.split(' ', 1)[0]
